@@ -1,44 +1,167 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Socket.io Chat</title>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp-like Chat App</title>
     <style>
-      /* Add some basic styling */
-      ul {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-      }
-      li {
-        margin-bottom: 10px;
-        padding-bottom: 5px;
-        border-bottom: 1px dotted #ddd;
-      }
-      #messages {
-        height: 300px;
-        overflow: auto;
-      }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .chat-app {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            background-color: #f6f6f6;
+            width: 30%;
+            border-right: 1px solid #ddd;
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header,
+        .chat-header {
+            padding: 1rem;
+            border-bottom: 1px solid #ddd;
+            background-color: #ededed;
+        }
+
+        .contact-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .contact {
+            padding: 1rem;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        .contact-hover {
+            background-color: #e0e0e0;
+        }
+
+        .messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            max-width: 60%;
+            border-radius: 5px;
+        }
+
+        .received {
+            background-color: #ededed;
+            align-self: flex-start;
+        }
+
+        .sent {
+            background-color: #34b7f1;
+            color: white;
+            align-self: flex-end;
+        }
+
+        .message-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #ddd;
+            background-color: #ededed;
+        }
+
+        .message-input input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .message-input button {
+            margin-left: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: #34b7f1;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .chat-footer button:hover {
+            background-color: #128c53;
+        }
+
+        /* Responsive styling*/
+        @media (max-width: 768px) {
+            .chat-app {
+                flex-direction: column;
+            }
+
+            .sidebar,
+            .chat-area {
+                width: 100%;
+            }
+        }
     </style>
-  </head>
-  <body>
-    <ul id="messages"></ul>
-    <form id="form" action="">
-      <input id="input" autocomplete="off" /><button>Send</button>
-    </form>
+</head>
+
+<body>
+    <div class="chat-app">
+        <aside class="sidebar">
+            <header class="sidebar-header">
+                <h2>Your Name</h2>
+            </header>
+            <ul class="contact-list">
+                <li class="contact">
+                    <span class="contact-name">John Doe</span>
+                </li>
+                <!-- Add more contacts as needed-->
+            </ul>
+        </aside>
+        <section class="chat-area">
+            <header class="chat-header">
+                <h2>John Doe</h2>
+            </header>
+            <div class="messages">
+                <div class="message received">Hello there!</div>
+                <div class="message sent">Hi, how are you?</div>
+                <!-- Add more messages as needed-->
+            </div>
+            <div class="message-input">
+                <input type="text" id="messageInput" placeholder="Type a message...">
+                <button id="sendButton">Send</button>
+            </div>
+        </section>
+    </div>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-      $(function () {
-        const socket = io();
-        $('form').submit(function() {
-          socket.emit('chat message', $('#input').val());
-          $('#input').val('');
-          return false;
+    <script>const socket = io();
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const message = document.getElementById('messageInput').value;
+            if (message.trim() !== "") {
+                socket.emit('chat message', message);
+                document.getElementById('messageInput').value = '';
+            }
         });
-        socket.on('chat message', function(msg) {
-          $('#messages').append($('<li>').text(msg));
+        socket.on('chat message', (msg) => {
+            const messageDiv = document.querySelector('.messages');
+            const newMessageDiv = document.createElement('div');
+            newMessageDiv.className = 'message received';
+            newMessageDiv.textContent = msg;
+            messageDiv.appendChild(newMessageDiv);
         });
-      });
     </script>
-  </body>
+</body>
 </html>
