@@ -27,7 +27,6 @@ function replaceWordsWithEmojis(text) {
 
 function handleSlashCommand(msg, socket) {
     console.log("Handling slash command:", msg);
-    const command = msg.split(':').pop().trim();
     const userName = socket.userName;
    
     switch (command) {
