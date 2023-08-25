@@ -62,6 +62,23 @@ body {
     border-radius: 5px;
 }
 
+.message.sent {
+    text-align: right;
+    background-color: #DCF8C6; /* A light green, but you can pick any color */
+    margin-left: 50%; /* Push the message to the right half of the chat window */
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.message.received {
+    text-align: left;
+    background-color: #EDEDED; /* A light gray, but you can pick any color */
+    margin-right: 50%; /* Limit the message to the left half of the chat window */
+    padding: 5px;
+    border-radius: 5px;
+}
+
+
 .received {
     background-color: #ededed;
     align-self: flex-start;
