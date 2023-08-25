@@ -7,23 +7,63 @@ const server = http.createServer(app);
 const io = socketIo(server)
 let onlineUsers = [];
 
+function replaceWordsWithEmojis(text) {
+    const emojiMap = {
+        "react": "⚛️",
+        "woah": "😲",
+        "hey": "👋",
+        "lol": "😂",
+        "like": "❤️",
+        "congratulations": "🎉"
+    };
+
+    for (let word in emojiMap) {
+        let regex = new RegExp(`\\b${word}\\b`, "gi");
+        text = text.replace(regex, emojiMap[word]);
+    }
+
+    return text;
+}
+
+
+app.use(express.static('public'));
+
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/public/index.html');
+});
+
+app.use((req, res, next) => {
+    console.log(`Request for: ${req.url}`);
+    next();
 });
 
 io.on('connection', (socket) => {
     console.log('a user connected');
 
-    socket.on('user joined', (name) => {
-        socket.userName = name; // Store the user's name on their socket session for later use
-        if (!onlineUsers.includes(name)) {
-            onlineUsers.push(name);
-        }
-        io.emit('update user list', onlineUsers);
-    });
 
+
+    socket.on('user joined', (name) => {
+        if (onlineUsers.includes(name)) {
+            // Emit a custom event back to the user that the username is taken
+            socket.emit('username taken');
+            return; // Exit out of the function
+        }
+
+        socket.userName = name;
+        onlineUsers.push(name);
+        io.emit('update user list', onlineUsers);
+        io.emit('user joined notification', `${name} has joined the chat`);
+        console.log(`Incoming username: ${name}`)
+    });
+    
     socket.on('chat message', (msg) => {
-        io.emit('chat message', msg);
+        console.log("Received message:", msg); // Debug log
+      
+        msg = replaceWordsWithEmojis(msg); // Convert words to emojis
+    
+        console.log("Message after emoji conversion:", msg); // Debug log
+    
+        io.emit('chat message', msg); // Broadcast the message
     });
 
     socket.on('disconnect', () => {
@@ -35,17 +75,8 @@ io.on('connection', (socket) => {
             io.emit('user left', `${disconnectedUser} has left the chat`);
         }
     });
-
-    socket.on('user joined', (name) => {
-        socket.userName = name;
-        if (!onlineUsers.includes(name)) {
-            onlineUsers.push(name);
-        }
-        io.emit('update user list', onlineUsers);
-        
-        io.emit('user joined notification', `${name} has joined the chat`);  // Emitting the user joined notification
-    });
 });
+
 
 const PORT = 3000;
 server.listen(PORT, () => {
