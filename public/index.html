@@ -37,7 +37,7 @@
 
         socket.on('update user list', (users) => {
             const userList = document.querySelector('.contact-list');
-            userList.innerHTML = ''; // Clear current list
+            userList.innerHTML = ''; 
 
             users.forEach(user => {
                 const userElement = document.createElement('li');
@@ -131,6 +131,17 @@
             userJoinedMessageDiv.className = 'join-message';  // Use the new CSS class
             userJoinedMessageDiv.textContent = msg;
             messageDiv.appendChild(userJoinedMessageDiv);
+        });
+
+        socket.on('clear chat', () => {
+            const messageDiv = document.querySelector('.messages');
+            while (messageDiv.firstChild) {
+                messageDiv.removeChild(messageDiv.firstChild);
+            }
+        });
+
+        socket.on('display warning', (msg) => {
+            alert(msg);
         });
 
     </script>

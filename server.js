@@ -25,6 +25,35 @@ function replaceWordsWithEmojis(text) {
     return text;
 }
 
+function handleSlashCommand(msg, socket) {
+    console.log("Handling slash command:", msg);
+    const command = msg.split(':').pop().trim();
+    const userName = socket.userName;
+   
+    switch (command) {
+        case '/help':
+            console.log("Handling /help command");
+            const helpMessage = '/help - Show this message\n/random - Print a random number\n/clear - Clear the chat';
+            socket.emit('display warning', helpMessage)
+            break;
+
+        case '/random':
+            console.log("Handling /random command");
+            const randomNumber = Math.floor(Math.random() * 100); // Random number between 0 and 99
+            socket.emit('chat message', `${userName}: Random Number - ${randomNumber}`);
+            break;
+
+        case '/clear':
+            console.log("Handling /clear command");
+            socket.emit('clear chat');
+            break;
+
+        default:
+            socket.emit('chat message', 'Unknown command');
+    }
+}
+
+
 
 app.use(express.static('public'));
 
@@ -55,14 +84,22 @@ io.on('connection', (socket) => {
         io.emit('user joined notification', `${name} has joined the chat`);
         console.log(`Incoming username: ${name}`)
     });
-    
+
     socket.on('chat message', (msg) => {
         console.log("Received message:", msg); // Debug log
-      
+
+        const messageContent = msg.split(':').slice(1).join(':').trim();
+
+        if (messageContent.startsWith('/')) {
+            console.log("Detected a slash command:", messageContent)
+            handleSlashCommand(messageContent, socket);
+            return;
+        }
+
         msg = replaceWordsWithEmojis(msg); // Convert words to emojis
-    
+
         console.log("Message after emoji conversion:", msg); // Debug log
-    
+
         io.emit('chat message', msg); // Broadcast the message
     });
 
@@ -76,7 +113,6 @@ io.on('connection', (socket) => {
         }
     });
 });
-
 
 const PORT = 3000;
 server.listen(PORT, () => {
