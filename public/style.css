@@ -2,6 +2,8 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    background-color: #1a1a1a;
+    color: #e6e6e6;
 }
 
 .chat-app {
@@ -10,9 +12,10 @@ body {
 }
 
 .sidebar {
-    background-color: #f6f6f6;
+    background-color: #232323;
     width: 30%;
-    border-right: 1px solid #ddd;
+    cursor: default;
+    border-right: 1px solid #3a3a3a;
 }
 
 .chat-area {
@@ -23,14 +26,14 @@ body {
 
 .active-user {
     background-color: #34b7f1;
-    color: white;
+    color: #1a1a1a;
 }
 
 .sidebar-header,
 .chat-header {
     padding: 1rem;
-    border-bottom: 1px solid #ddd;
-    background-color: #ededed;
+    border-bottom: 1px solid #3a3a3a;
+    background-color: #202020;
 }
 
 .contact-list {
@@ -41,113 +44,132 @@ body {
 
 .contact {
     padding: 1rem;
-    border-bottom: 1px solid #ddd;
-    cursor: pointer;
+    border-bottom: 1px solid #3a3a3a;
+    cursor: default;
 }
 
 .contact-hover {
-    background-color: #e0e0e0;
+    background-color: #2a2a2a;
 }
 
 .messages {
     flex: 1;
     padding: 1rem;
     overflow-y: auto;
+    background-color: #1a1a1a;
+    display: flex;
+    flex-direction: column;
 }
 
 .message {
     margin-bottom: 1rem;
-    padding: 0.5rem;
-    max-width: 60%;
+    padding: 5px;
     border-radius: 5px;
+    display: inline-flex;
+    max-width: 60%;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.message .username {
+    font-weight: bold;  /* Bold usernames for distinction */
+    color: #e6e6e6;     /* Use a different color for usernames, e.g., a shade of blue */
+    margin-right: 8px; /* Some spacing between the username and the message */
+}
+
+.message .user-message {
+    color: #333; /* Dark grey for the actual message */
+}
+
+.message.received .user-message {
+    color: #e6e6e6;
 }
 
 .message.sent {
-    text-align: right;
-    background-color: #DCF8C6; /* A light green, but you can pick any color */
-    margin-left: 50%; /* Push the message to the right half of the chat window */
-    padding: 5px;
-    border-radius: 5px;
+    background-color: #34b7f1;
+    color: #1a1a1a;
+    align-self: flex-end;
 }
 
 .message.received {
-    text-align: left;
-    background-color: #EDEDED; /* A light gray, but you can pick any color */
-    margin-right: 50%; /* Limit the message to the left half of the chat window */
-    padding: 5px;
-    border-radius: 5px;
-}
-
-
-.received {
-    background-color: #ededed;
+    background-color: #2a2a2a;
+    color: #e6e6e6;
     align-self: flex-start;
-}
-
-.sent {
-    background-color: #34b7f1;
-    color: white;
-    align-self: flex-end;
 }
 
 .message-input {
     display: flex;
     padding: 1rem;
-    border-top: 1px solid #ddd;
-    background-color: #ededed;
+    border-top: 1px solid #3a3a3a;
+    align-items: center;
+    background-color: #1a1a1a; /* Fixing green dot issue */
 }
 
 .message-input input {
     flex: 1;
     padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 1px solid #3a3a3a;
+    background-color: #232323;
+    border-radius: 20px;
+    color: #e6e6e6;
+    margin-right: 1rem;
 }
 
 .message-input button {
-    margin-left: 1rem;
-    padding: 0.5rem 1rem;
     background-color: #34b7f1;
-    color: white;
+    color: #1a1a1a;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    background: linear-gradient(to right, #34b7f1, #11998e);
+    transition: 0.3s;
+    padding: 0.75rem 1.5rem;
 }
 
-.warning-message {
-    text-align: center;
-    padding: 0.5rem;
-    color: red;
+.message-input button:hover {
+    background: linear-gradient(to right, #11998e, #34b7f1);
+}
+
+.warning-message, .system-notification {
+    text-align: left;
+    padding: 8px 12px;
+    color: #333;
     font-weight: bold;
-    background-color: #ffe0e0;
-    /* light red background */
+    background: linear-gradient(to right, #11998e, #38ef7d);
+    background-color: #2a2a2a;
+    border: 1px solid #3a3a3a;
     margin: 0.5rem 0;
     border-radius: 5px;
-}
-
-.system-notification {
-    text-align: center;
-    padding: 0.5rem;
-    font-style: italic;
-    color: #888;
+    align-self: center;
 }
 
 .join-message {
+    align-self: center;
     text-align: center;
-    padding: 0.5rem;
-    color: green;
-    font-weight: bold;
-    background-color: #e0ffe0;
-    /* light green background */
-    margin: 0.5rem 0;
+    background: linear-gradient(to right, #11998e, #38ef7d);
+    padding: 8px 12px;
+    color: #333;
     border-radius: 5px;
+    margin-bottom: 8px;
+    font-weight: bold;
+    
 }
 
-.chat-footer button:hover {
-    background-color: #128c53;
+.contact.active-user::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background-color: green;
+    border-radius: 50%;
+    margin-left: 10px;
+    display: inline-block;
 }
 
-/* Responsive styling*/
+.contact:hover {
+    background-color: #2a2a2a;
+}
+
+/* Responsive styling */
 @media (max-width: 768px) {
     .chat-app {
         flex-direction: column;

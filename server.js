@@ -28,6 +28,7 @@ function replaceWordsWithEmojis(text) {
 function handleSlashCommand(msg, socket) {
     console.log("Handling slash command:", msg);
     const userName = socket.userName;
+    const command = msg.split(' ')[0];
    
     switch (command) {
         case '/help':
@@ -52,7 +53,7 @@ function handleSlashCommand(msg, socket) {
     }
 }
 
-
+let onlineCount = 0
 
 app.use(express.static('public'));
 
@@ -71,6 +72,7 @@ io.on('connection', (socket) => {
 
 
     socket.on('user joined', (name) => {
+        if (!name || name.trim() === "") return;
         if (onlineUsers.includes(name)) {
             // Emit a custom event back to the user that the username is taken
             socket.emit('username taken');
@@ -81,7 +83,8 @@ io.on('connection', (socket) => {
         onlineUsers.push(name);
         io.emit('update user list', onlineUsers);
         io.emit('user joined notification', `${name} has joined the chat`);
-        console.log(`Incoming username: ${name}`)
+        io.emit('updateOnlineCount', onlineUsers.length);
+        console.log(`Incoming username: ${name}`);
     });
 
     socket.on('chat message', (msg) => {
@@ -105,10 +108,11 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('user disconnected');
         const disconnectedUser = socket.userName; // Retrieve the user's name from the socket session
-        if (disconnectedUser) {
+        if (disconnectedUser && onlineUsers.includes(disconnectedUser)) {
             onlineUsers = onlineUsers.filter(user => user !== disconnectedUser);
             io.emit('update user list', onlineUsers);
             io.emit('user left', `${disconnectedUser} has left the chat`);
+            io.emit('updateOnlineCount', onlineUsers.length);
         }
     });
 });

@@ -37,7 +37,7 @@
 
         socket.on('update user list', (users) => {
             const userList = document.querySelector('.contact-list');
-            userList.innerHTML = ''; 
+            userList.innerHTML = '';
 
             users.forEach(user => {
                 const userElement = document.createElement('li');
@@ -58,8 +58,6 @@
                 userList.appendChild(userElement);
             });
         });
-
-
 
         socket.on('username taken', () => {
             alert('Username is already taken. Please choose another.');
@@ -95,7 +93,6 @@
             }
         });
 
-
         socket.on('chat message', (msg) => {
 
             const messageDiv = document.querySelector('.messages');
@@ -110,8 +107,18 @@
                 newMessageDiv.className = 'message received';
             }
 
+            let [user, messageContent] = msg.split(':');
+            const usernameSpan = document.createElement('span');
+            const userMessageSpan = document.createElement('span');
 
-            newMessageDiv.textContent = msg;
+            usernameSpan.className = 'username';
+            usernameSpan.textContent = user + ":"; // The name and colon
+
+            userMessageSpan.className = 'user-message'; // This will apply the user-message class to the message content
+            userMessageSpan.textContent = messageContent.trim();
+
+            newMessageDiv.appendChild(usernameSpan);
+            newMessageDiv.appendChild(userMessageSpan);
             messageDiv.appendChild(newMessageDiv);
         });
 
@@ -143,6 +150,12 @@
         socket.on('display warning', (msg) => {
             alert(msg);
         });
+
+        socket.on('updateOnlineCount', (count) => {
+            const headerElement = document.querySelector('.sidebar-header');
+            headerElement.textContent = `Contacts (${count} Online)`;
+        });
+
 
     </script>
 </body>
