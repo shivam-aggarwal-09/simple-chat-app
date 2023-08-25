@@ -29,6 +29,11 @@
             flex-direction: column;
         }
 
+        .active-user {
+            background-color: #34b7f1;
+            color: white;
+        }
+
         .sidebar-header,
         .chat-header {
             padding: 1rem;
@@ -100,6 +105,37 @@
             cursor: pointer;
         }
 
+        .warning-message {
+            text-align: center;
+            padding: 0.5rem;
+            color: red;
+            font-weight: bold;
+            background-color: #ffe0e0;
+            /* light red background */
+            margin: 0.5rem 0;
+            border-radius: 5px;
+        }
+
+        .system-notification {
+            text-align: center;
+            padding: 0.5rem;
+            font-style: italic;
+            color: #888;
+        }
+
+        .join-message {
+            text-align: center;
+            padding: 0.5rem;
+            color: green;
+            font-weight: bold;
+            background-color: #e0ffe0;
+            /* light green background */
+            margin: 0.5rem 0;
+            border-radius: 5px;
+        }
+
+
+
         .chat-footer button:hover {
             background-color: #128c53;
         }
@@ -122,22 +158,17 @@
     <div class="chat-app">
         <aside class="sidebar">
             <header class="sidebar-header">
-                <h2>Your Name</h2>
+                <h2>Online Users</h2>
             </header>
             <ul class="contact-list">
-                <li class="contact">
-                    <span class="contact-name">John Doe</span>
-                </li>
                 <!-- Add more contacts as needed-->
             </ul>
         </aside>
         <section class="chat-area">
             <header class="chat-header">
-                <h2>John Doe</h2>
+                <h2>100x Chat</h2>
             </header>
             <div class="messages">
-                <div class="message received">Hello there!</div>
-                <div class="message sent">Hi, how are you?</div>
                 <!-- Add more messages as needed-->
             </div>
             <div class="message-input">
@@ -148,20 +179,91 @@
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script>const socket = io();
+        let userName = prompt("Please enter your name:", "Guest"); // Provide a default name of "Guest" if they cancel or input an empty string
+        if (userName === null || userName.trim() === "") {
+            userName = "Guest";
+        }
+        socket.emit('user joined', userName)
+
+        socket.on('update user list', (users) => {
+            const userList = document.querySelector('.contact-list');
+            userList.innerHTML = ''; // Clear current list
+
+            users.forEach(user => {
+                const userElement = document.createElement('li');
+                userElement.className = 'contact';
+                if (user === userName) {
+                    userElement.classList.add('active-user');
+                }
+                userElement.textContent = user;
+
+                // Add hover effect
+                userElement.addEventListener('mouseenter', () => {
+                    userElement.classList.add('contact-hover');
+                });
+                userElement.addEventListener('mouseleave', () => {
+                    userElement.classList.remove('contact-hover');
+                });
+
+                userList.appendChild(userElement);
+            });
+        });
+
+
         document.getElementById('sendButton').addEventListener('click', () => {
             const message = document.getElementById('messageInput').value;
             if (message.trim() !== "") {
-                socket.emit('chat message', message);
+                socket.emit('chat message', `${userName}: ${message}`);
                 document.getElementById('messageInput').value = '';
             }
         });
+
+        const messageInput = document.getElementById('messageInput');
+
+        messageInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) { // Detect Enter without Shift
+                event.preventDefault(); // Prevents the default action (e.g. new line)
+                document.getElementById('sendButton').click();
+            }
+        });
+
+
         socket.on('chat message', (msg) => {
             const messageDiv = document.querySelector('.messages');
             const newMessageDiv = document.createElement('div');
-            newMessageDiv.className = 'message received';
+
+            // Check if the message starts with the user's name to determine if it was sent or received
+            if (msg.startsWith(userName + ":")) {
+                newMessageDiv.className = 'message sent';
+                // Replace user's name with "You"
+                msg = msg.replace(userName + ":", "You:");
+            } else {
+                newMessageDiv.className = 'message received';
+            }
+
             newMessageDiv.textContent = msg;
             messageDiv.appendChild(newMessageDiv);
         });
+
+        socket.on('user left', (msg) => {
+            const messageDiv = document.querySelector('.messages');
+            const userLeftMessageDiv = document.createElement('div');
+
+            userLeftMessageDiv.className = 'warning-message';
+            userLeftMessageDiv.textContent = msg;
+            messageDiv.appendChild(userLeftMessageDiv);
+        });
+
+        socket.on('user joined notification', (msg) => {
+            const messageDiv = document.querySelector('.messages');
+            const userJoinedMessageDiv = document.createElement('div');
+
+            userJoinedMessageDiv.className = 'join-message';  // Use the new CSS class
+            userJoinedMessageDiv.textContent = msg;
+            messageDiv.appendChild(userJoinedMessageDiv);
+        });
+
     </script>
 </body>
+
 </html>
